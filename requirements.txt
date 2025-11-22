@@ -1,0 +1,7 @@
+pymupdf
+qdrant-client
+sentence-transformers
+fastembed
+google-generativeai
+streamlit
+python-dotenv

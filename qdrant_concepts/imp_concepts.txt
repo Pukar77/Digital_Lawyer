@@ -1,0 +1,23 @@
+Simple workflow of qdrant:
+a)Connect to qdrant -> 
+client = QdrantClient(
+    url="http://localhost:6333",  # your docker qdrant
+)
+
+b)Create a collection->
+client.create_collection(
+    collection_name=collection_name,
+    vectors_config=VectorParams(size=384, distance=Distance.COSINE)  # 384 dims for MiniLM
+)
+
+c)Load the text or document to store in qdrant
+
+d)Perform chunking
+
+e)# 5) Load embedding model->
+
+model = SentenceTransformer("sentence-transformers/all-MiniLM-L6-v2")
+
+f)Embed chunks and store in database
+
+g)Search
