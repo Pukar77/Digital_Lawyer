@@ -6,7 +6,7 @@ import os
 
 # --- INITIALIZATION ---
 load_dotenv() 
-# Load API Key from .env (secured)
+
 GOOGLE_API_KEY = os.getenv("GEMINI_API_KEY")
 
 if not GOOGLE_API_KEY:
