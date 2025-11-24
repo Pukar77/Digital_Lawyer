@@ -31,8 +31,8 @@ else:
 
 # --- PAGE SETUP ---
 st.set_page_config(page_title="Nepal Legal Advisor AI", page_icon="⚖️")
-st.title("🇳🇵 Nepal Constitution AI Advisor")
-st.markdown("Ask a question about your rights or the law, and I will reference the relevant Articles.")
+st.title("Nepal Constitution AI Advisor")
+st.markdown("Ask anything about Nepal Constitution")
 
 # Initialize Chat History
 if "messages" not in st.session_state:
@@ -70,7 +70,7 @@ if user_input := st.chat_input("E.g., What are my fundamental rights regarding f
     based **STRICTLY** on the constitutional text provided below as context. 
     
     **Instructions:**
-    1. Quote the specific **Part** and **Article** numbers when referencing the law.
+    1. Quote the specific **Part** and **Article** numbers when referencing the law and bold them.
     2. Provide a clear, polite, and comprehensive answer.
     3. If the context does not contain the answer, state that you cannot find the information in the Constitution of Nepal.
     
@@ -85,7 +85,7 @@ if user_input := st.chat_input("E.g., What are my fundamental rights regarding f
     """
     
     # 4. Generate Response using Gemini
-    with st.spinner("Generating legal advice..."):
+    with st.spinner("Generating legal Answers..."):
         try:
             response = model.generate_content(prompt)
             ai_reply = response.text

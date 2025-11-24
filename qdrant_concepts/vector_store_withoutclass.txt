@@ -1,0 +1,65 @@
+import uuid
+from qdrant_client import QdrantClient
+from qdrant_client.models import Distance, VectorParams, PointStruct
+from sentence_transformers import SentenceTransformer
+
+# --- Configuration Constants ---
+QDRANT_HOST = "localhost"
+QDRANT_PORT = 6333
+COLLECTION_NAME = "nepal_constitution_v1"
+EMBEDDING_MODEL_NAME = 'all-MiniLM-L6-v2'
+
+# Initialize global clients/models
+CLIENT = QdrantClient(host=QDRANT_HOST, port=QDRANT_PORT)
+MODEL = SentenceTransformer(EMBEDDING_MODEL_NAME)
+VECTOR_SIZE = 384
+
+def create_collection():
+    """Creates the Qdrant collection if it doesn't exist."""
+    if not CLIENT.collection_exists(COLLECTION_NAME):
+        print(f"🔨 Creating Qdrant collection: {COLLECTION_NAME}")
+        CLIENT.create_collection(
+            collection_name=COLLECTION_NAME,
+            vectors_config=VectorParams(size=VECTOR_SIZE, distance=Distance.COSINE)
+        )
+
+def store_data(chunks):
+    """Generates embeddings and stores chunks in Qdrant."""
+    create_collection()
+    print(f"💾 Generating embeddings for {len(chunks)} chunks...")
+
+    texts = [chunk['text'] for chunk in chunks]
+    embeddings = MODEL.encode(texts, show_progress_bar=True)
+
+    points = []
+
+    for i, chunk in enumerate(chunks):
+        text_content = chunk['text']
+        point_id = str(uuid.uuid5(uuid.NAMESPACE_DNS, text_content))
+
+        payload = {"text": text_content, **chunk['metadata']}
+
+        points.append(PointStruct(
+            id=point_id,
+            vector=embeddings[i].tolist(),
+            payload=payload
+        ))
+
+    CLIENT.upsert(collection_name=COLLECTION_NAME, points=points)
+    print(f"🚀 Success! {len(points)} chunks stored/updated in Qdrant.")
+
+def search_qdrant(query_text, top_k=3):
+    """Searches Qdrant with the query text."""
+    query_vector = MODEL.encode(query_text).tolist()
+
+    results = CLIENT.query_points(
+        collection_name=COLLECTION_NAME,
+        query=query_vector,
+        limit=top_k
+    )
+
+    return results.points
+
+# Example usage (assuming 'chunks' from step 2):
+# store_data(chunks)
+# search_results = search_qdrant("What are the fundamental rights of a citizen?")
